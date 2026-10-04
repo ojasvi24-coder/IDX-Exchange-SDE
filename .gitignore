@@ -1,0 +1,11 @@
+node_modules/
+.env
+.env.*
+!.env.example
+build/
+coverage/
+*.log
+.DS_Store
+*.sql.bak
+# Large provided data dumps are never committed
+rets_*.sql
