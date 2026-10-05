@@ -1,4 +1,6 @@
-const BASE = '/api';
+// Defaults to the dev proxy (/api). REACT_APP_API_URL lets a developer call Express
+// directly (CORS is enabled); needed when the dev proxy truncates large responses.
+const BASE = process.env.REACT_APP_API_URL || '/api';
 
 // Drop undefined / null / '' so empty form fields are never sent to the backend.
 export function cleanParams(params = {}) {
