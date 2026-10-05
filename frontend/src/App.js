@@ -1,5 +1,6 @@
 import { Link, Route, Routes } from 'react-router-dom';
 import ListingsPage from './pages/ListingsPage';
+import PropertyDetailPage from './pages/PropertyDetailPage';
 import './App.css';
 
 export default function App() {
@@ -11,6 +12,7 @@ export default function App() {
       <main className="main">
         <Routes>
           <Route path="/" element={<ListingsPage />} />
+          <Route path="/property/:id" element={<PropertyDetailPage />} />
           <Route path="*" element={<p className="message">Page not found.</p>} />
         </Routes>
       </main>
