@@ -122,10 +122,10 @@ describe('GET /api/properties', () => {
 
 describe('sorting', () => {
   it.each([
-    ['L_SystemPrice', 'desc', 'ORDER BY L_SystemPrice IS NULL, L_SystemPrice DESC, id ASC'],
-    ['ListingContractDate', 'asc', 'ORDER BY ListingContractDate IS NULL, ListingContractDate ASC, id ASC'],
-    ['LM_Int2_3', 'DESC', 'ORDER BY LM_Int2_3 IS NULL, LM_Int2_3 DESC, id ASC'],
-    ['L_Keyword2', 'asc', 'ORDER BY L_Keyword2 IS NULL, L_Keyword2 ASC, id ASC'],
+    ['L_SystemPrice', 'desc', 'ORDER BY L_SystemPrice DESC, id DESC'],
+    ['ListingContractDate', 'asc', 'ORDER BY ListingContractDate ASC, id ASC'],
+    ['LM_Int2_3', 'DESC', 'ORDER BY LM_Int2_3 DESC, id DESC'],
+    ['L_Keyword2', 'asc', 'ORDER BY L_Keyword2 ASC, id ASC'],
   ])('sorts by %s %s using the real column', async (by, order, expected) => {
     mockDb();
     const res = await request(app).get(`/api/properties?sortBy=${by}&sortOrder=${order}`);
