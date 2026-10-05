@@ -30,7 +30,23 @@ const renderCard = (property) => render(
   </TestRouter>,
 );
 
+beforeEach(() => window.localStorage.clear());
+
 describe('PropertyCard', () => {
+  it('heart toggles favorite state without navigating', () => {
+    renderCard(base);
+    const heart = screen.getByRole('button', { name: 'Add to favorites' });
+    expect(heart).toHaveAttribute('aria-pressed', 'false');
+    expect(heart).toHaveTextContent('♡');
+    fireEvent.click(heart);
+    const filled = screen.getByRole('button', { name: 'Remove from favorites' });
+    expect(filled).toHaveAttribute('aria-pressed', 'true');
+    expect(filled).toHaveTextContent('♥');
+    expect(screen.queryByTestId('location')).not.toBeInTheDocument();
+    fireEvent.click(filled);
+    expect(screen.getByRole('button', { name: 'Add to favorites' })).toBeInTheDocument();
+  });
+
   it('shows price, address, locality, beds, baths, sqft and the first photo', () => {
     renderCard(base);
     expect(screen.getByText('$750,000')).toBeInTheDocument();

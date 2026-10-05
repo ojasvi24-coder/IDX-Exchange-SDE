@@ -165,3 +165,49 @@ describe('ListingsPage pagination', () => {
     expect(screen.queryByRole('navigation', { name: 'Pagination' })).not.toBeInTheDocument();
   });
 });
+
+describe('ListingsPage sorting', () => {
+  const many = (offset = 0) => page(
+    Array.from({ length: 20 }, (_, i) => property(offset + i + 1, `${offset + i + 1} Main St`)),
+    100,
+    offset,
+  );
+  const choose = (value) => fireEvent.change(screen.getByLabelText('Sort by'), { target: { value } });
+
+  it('sends real SQL column names for the chosen sort and returns to page 1', async () => {
+    const pending = deferredFetch();
+    renderPage('/?page=3');
+    await act(async () => pending[0](many(40)));
+    choose('L_SystemPrice:desc');
+    expect(lastUrl()).toBe('/api/properties?sortBy=L_SystemPrice&sortOrder=desc&limit=20&offset=0');
+    expect(screen.getByTestId('search')).not.toHaveTextContent('page=');
+  });
+
+  it('keeps the sort when changing pages', async () => {
+    const pending = deferredFetch();
+    renderPage('/?sortBy=LM_Int2_3&sortOrder=desc');
+    await act(async () => pending[0](many()));
+    expect(screen.getByLabelText('Sort by')).toHaveValue('LM_Int2_3:desc');
+    click('Page 2');
+    expect(lastUrl()).toBe('/api/properties?sortBy=LM_Int2_3&sortOrder=desc&limit=20&offset=20');
+  });
+
+  it('resets the sort when new filters are searched', async () => {
+    const pending = deferredFetch();
+    renderPage('/?sortBy=L_SystemPrice&sortOrder=asc&city=Irvine');
+    await act(async () => pending[0](many()));
+    type('City', 'Tustin');
+    click('Search');
+    expect(lastUrl()).toBe('/api/properties?city=Tustin&limit=20&offset=0');
+    await act(async () => pending[1](many()));
+    expect(screen.getByLabelText('Sort by')).toHaveValue('');
+  });
+
+  it('keeps filters when the sort changes and can return to the default order', async () => {
+    const pending = deferredFetch();
+    renderPage('/?city=Irvine&sortBy=L_Keyword2&sortOrder=asc');
+    await act(async () => pending[0](many()));
+    choose('');
+    expect(lastUrl()).toBe('/api/properties?city=Irvine&limit=20&offset=0');
+  });
+});
