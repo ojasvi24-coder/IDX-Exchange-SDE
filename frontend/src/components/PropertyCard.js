@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Link, useNavigate } from 'react-router-dom';
+import FavoriteButton from './FavoriteButton';
 import PropertyImageCarousel from './PropertyImageCarousel';
 import { parsePhotos } from '../utils/photos';
 import {
@@ -22,6 +23,7 @@ export default function PropertyCard({ property }) {
     // The whole card is clickable for mouse users; the address <Link> is the
     // keyboard/screen-reader entry point to the same destination.
     <article className="card" onClick={() => navigate(path)} data-testid="property-card">
+      <FavoriteButton property={property} />
       <PropertyImageCarousel photos={photos} alt={`Photo of ${street}`} />
       <div className="card__body">
         <p className="card__price">{formatPrice(property.L_SystemPrice)}</p>
