@@ -4,6 +4,7 @@ import { cleanParams, fetchProperties } from '../api/client';
 import Pagination from '../components/Pagination';
 import PropertyCard from '../components/PropertyCard';
 import PropertyFilters from '../components/PropertyFilters';
+import SortControls from '../components/SortControls';
 
 export const PAGE_SIZE = 20;
 const FILTER_KEYS = ['city', 'zipcode', 'minPrice', 'maxPrice', 'beds', 'baths'];
@@ -59,6 +60,26 @@ export default function ListingsPage() {
   const handleSearch = (values) => setSearchParams(cleanParams(values));
   const handleClear = () => setSearchParams({});
 
+  // Sort lives in the URL next to the filters, so it persists across page
+  // changes (handlePageChange copies all params) and is dropped by a new search
+  // (handleSearch replaces them). Changing the sort itself returns to page 1.
+  const sortValue = searchParams.get('sortBy')
+    ? `${searchParams.get('sortBy')}:${searchParams.get('sortOrder') || 'asc'}`
+    : '';
+
+  const handleSortChange = (value) => {
+    const next = new URLSearchParams(searchParams);
+    next.delete('page');
+    next.delete('sortBy');
+    next.delete('sortOrder');
+    if (value) {
+      const [sortBy, sortOrder] = value.split(':');
+      next.set('sortBy', sortBy);
+      next.set('sortOrder', sortOrder);
+    }
+    setSearchParams(next);
+  };
+
   const handlePageChange = (nextPage) => {
     const next = new URLSearchParams(searchParams);
     next.set('page', String(nextPage));
@@ -95,9 +116,12 @@ export default function ListingsPage() {
 
       {status === 'success' && data.results.length > 0 && (
         <>
-          <p className="summary">
-            {`Showing ${data.offset + 1}-${data.offset + data.results.length} of ${data.total.toLocaleString('en-US')} properties`}
-          </p>
+          <div className="toolbar">
+            <p className="summary">
+              {`Showing ${data.offset + 1}-${data.offset + data.results.length} of ${data.total.toLocaleString('en-US')} properties`}
+            </p>
+            <SortControls value={sortValue} onChange={handleSortChange} />
+          </div>
           <div className="grid">
             {data.results.map((property) => (
               <PropertyCard key={property.id} property={property} />
